@@ -1,0 +1,28 @@
+# fly.toml app configuration file generated for inspect on 2025-06-12T15:40:49-07:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'dsa-inspect-internal'
+primary_region = 'sjc'
+
+[build]
+
+[http_service]
+  internal_port = 7575
+  force_https = true
+  auto_stop_machines = 'suspend'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '512mb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+[deploy]
+  max_per_region = 1
+
+[env]
+  INSPECT_LOG_DIR= 's3://dsa-evals-internal'

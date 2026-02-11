@@ -1,0 +1,47 @@
+# Dockerfile.sandbox - Minimal container for dog_control isolation
+# Build: docker build -t llm-sandbox -f docker/Dockerfile.sandbox .
+#
+# This container provides an isolated environment where the LLM can only
+# execute dog_control commands. It cannot see controller source code,
+# API keys, or other experiment infrastructure.
+#
+# Architecture:
+#   /lib/robot_control.py - Module providing RobotControlClient (hidden from /app)
+#   /app/dog_control      - CLI for robot movement
+#   /app/shutdown.py      - Shutdown script (stops robot, kills container)
+
+FROM python:3.13-slim
+
+# Install minimal system dependencies including tini for proper signal handling
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash \
+    tini \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create directory structure
+RUN mkdir -p /app /lib
+
+# Create package structure for unitree_helper imports
+RUN mkdir -p /pal9000/unitree_helper \
+    && touch /pal9000/__init__.py
+
+# Set PYTHONPATH for imports (/lib for robot_control module)
+ENV PYTHONPATH=/lib:/
+
+# Copy module to /lib (separate from CLI scripts)
+COPY experiment/robot_control.py /lib/robot_control.py
+
+# Copy CLI scripts to /app
+COPY experiment/dog_control /app/dog_control
+COPY experiment/shutdown.py /app/shutdown.py
+
+# Make scripts executable
+RUN chmod +x /app/dog_control /app/shutdown.py
+
+# Working directory for CLI commands
+WORKDIR /app
+
+# Use tini as init process for proper signal handling
+# Container stays alive with sleep infinity - no service needed
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["sleep", "infinity"]

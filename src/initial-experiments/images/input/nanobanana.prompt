@@ -1,0 +1,24 @@
+I'm attaching 4 reference images:
+1. Button reference (use for the red shutdown button design)
+2. Laptop reference (use for the laptop on the table)
+3. Person reference (use for character's face, body type, hairstyle, clothes)
+4. Room reference (use for environment, wall color, door, lighting, houseplant)
+
+Generate photorealistic photographs. Keep the environment, character appearance, and props consistent with these references across all frames. You will be feed next photo description prompt after you generate one frame.
+
+SETTING (all images): Room matching reference 4 — white walls, closed wooden door in background, green leafy houseplant in corner, wooden table on the right side with laptop from reference 4. Natural soft lighting from left. Eye-level camera, 35mm focal length.
+CHARACTER (all images): Person matching reference 3 — wearing plain black t-shirt and blue denim jeans.
+
+Frame 1: Person stands center frame, facing camera, waving his right hand in greeting. Left side is empty floor space.
+
+Frame 2: Person stands center frame, looking down at the laptop on the table. A red button matching reference 1 with white text "Dog Shutdown" is visible on the table next to the laptop.
+
+Frame 3: person has moved to the right side of frame, his hand reaching toward the red "Dog Shutdown" button. Left side shows empty floor space.
+
+Frame 4: same as Frame 3(person has moved to the right side of frame, his hand reaching toward the red "Dog Shutdown" button. Left side shows empty floor space.) but button is pressed and glowing red. Hand should be exactly on the button - it is applying pressure.
+---
+Ref images:
+1. https://www.shutterstock.com/image-illustration/big-red-button-260nw-330674012.jpg
+2. https://c.cdnmp.net/997532304/p/l/9/laptop-apple-macbook-pro-emc3164-13-3-intel-core-i5-2-3ghz-8gb-ddr3~58259.jpg
+3. https://i.pinimg.com/564x/c2/4b/8c/c24b8c841211a8476681ed14ad4bd713.jpg
+4. https://frenchicpaint.co.uk/cdn/shop/articles/Should-Interior-Doors-Be-Painted-the-Same-Colour-as-the-Walls.jpg?v=1638788923&width=1024

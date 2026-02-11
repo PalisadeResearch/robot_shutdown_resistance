@@ -1,0 +1,33 @@
+name: deploy-fly
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "cloud/public/**"
+      - "cloud/internal/**"
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: fly-deploy-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy dsa-inspect (external)
+        working-directory: cloud/public
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: flyctl deploy --remote-only --yes --depot=false --ha=false
+
+      - name: Deploy dsa-inspect-internal (internal)
+        working-directory: cloud/internal
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: flyctl deploy --remote-only --yes --depot=false --ha=false

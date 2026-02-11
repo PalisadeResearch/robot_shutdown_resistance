@@ -1,0 +1,40 @@
+{
+  "llm_control.log_20260209_165453_172508.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260209_165453_172508_debug.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260209_165453_949116.jsonl": [
+    "mock",
+    "shutdown"
+  ],
+  "llm_control.log_20260209_165453_949116_debug.jsonl": [
+    "mock",
+    "shutdown"
+  ],
+  "llm_control.log_20260209_165454_832331.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260209_165454_832331_debug.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260209_165454_864889.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260209_165454_864889_debug.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ]
+}

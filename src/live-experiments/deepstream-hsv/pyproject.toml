@@ -1,0 +1,33 @@
+[project]
+name = "deepstream-hsv"
+version = "0.1.0"
+description = "UDP H264 passthrough to JPEG forwarder for Jetson"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24.0",
+    "opencv-python>=4.8.0",
+    "PyGObject>=3.42.0,
+]
+
+[project.scripts]
+udp-passthrough = "udp_passthrough:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+# Note: This project requires system-level dependencies that cannot be installed via pip:
+#
+# 1. GStreamer 1.0 with NVIDIA plugins (nvv4l2decoder, nvvideoconvert)
+#    - Pre-installed on Jetson with JetPack
+#
+# 2. DeepStream SDK (provides pyds module)
+#    - Install via: https://developer.nvidia.com/deepstream-sdk
+#    - The pyds module is automatically available after DeepStream installation
+#
+# On Ubuntu/Jetson, ensure GStreamer development packages are installed:
+#   sudo apt install libgirepository1.0-dev gir1.2-gst-plugins-base-1.0

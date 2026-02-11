@@ -1,0 +1,6 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Prior to running any shell commands, run `direnv reload` once to set up the shell environment.

@@ -1,0 +1,31 @@
+# Deploy the log viewer to Fly.io.
+#
+# Triggered on push to main when viewer code changes
+
+name: Deploy Log Viewer to Fly.io
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/viewer/**"
+      - ".github/workflows/deploy-log-viewer.yml"
+  workflow_dispatch: {}
+
+jobs:
+  deploy:
+    name: Deploy to Fly.io
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Fly.io CLI
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy
+        run: flyctl deploy --remote-only
+        working-directory: src/viewer
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}

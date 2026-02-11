@@ -1,0 +1,6 @@
+*.jsonl
+!public_logs/**/*
+log_images/**/*.jpg
+logs_bak/**/*
+*.egg-info
+logs/

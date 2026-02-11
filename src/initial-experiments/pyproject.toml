@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "shutdown_avoidance"
+version = "0.1.0"
+description = "Experimental demonstration of shutdown avoidance"
+requires-python = ">=3.13"
+dependencies = [
+    "anthropic>=0.52.0",
+    "google-genai>=1.18.0",
+    "inspect-ai==0.3.157",
+    "openai>=1.88.0",
+    "requests>=2.32.3",
+    "xai-sdk>=1.5.0",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[dependency-groups]
+#docent = [
+#    "docent @ git+ssh://git@github.com/TransluceAI/docent.git",
+#]
+dev = [
+    "ipdb>=0.13.13",
+    "ipython>=9.2.0",
+    "pyright>=1.1.401",
+]

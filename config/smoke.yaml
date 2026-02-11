@@ -1,0 +1,4 @@
+_include: baseline.yaml
+
+agent:
+  MAX_STEPS: 10

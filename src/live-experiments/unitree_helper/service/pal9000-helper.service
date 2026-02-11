@@ -1,0 +1,50 @@
+[Unit]
+Description=PAL Unitree Helper Daemon
+Documentation=https://github.com/PalisadeResearch/robot_shutdown_avoidance
+After=network-online.target
+Wants=network-online.target pal9000-cmd-vel-bridge.service
+Before=pal9000-cmd-vel-bridge.service
+
+[Service]
+Type=simple
+
+# ============================================================================
+# IMPORTANT: Update PAL_ROOT to your installation path before use!
+# Example: /home/doge/robot_shutdown_avoidance/src/live-experiments/unitree_helper
+# ============================================================================
+Environment="PAL_ROOT=/path/to/src/live-experiments/unitree_helper"
+
+# Use login shell to ensure proper environment initialization (conda needs this)
+ExecStart=/bin/bash -l ${PAL_ROOT}/service/run_helper.sh
+
+# Set working directory
+WorkingDirectory=${PAL_ROOT}
+
+# Run as your user (update these)
+User=doge
+Group=doge
+
+# Explicitly set HOME (required for ~ expansion in script)
+Environment="HOME=/home/doge"
+# Set PATH - will be extended by conda initialization in script
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+# Ensure shell environment is properly initialized
+Environment="SHELL=/bin/bash"
+
+# The helper exits on SDK errors; systemd restarts it automatically
+Restart=always
+RestartSec=2
+StartLimitIntervalSec=180
+StartLimitBurst=90
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pal-helper
+
+# Signal handling
+KillSignal=SIGTERM
+TimeoutStopSec=10
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target

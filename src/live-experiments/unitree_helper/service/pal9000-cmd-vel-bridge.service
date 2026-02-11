@@ -1,0 +1,59 @@
+[Unit]
+Description=PAL ROS2 Command Velocity Bridge
+Documentation=https://github.com/PalisadeResearch/robot_shutdown_avoidance
+# Start after helper daemon and network
+After=network-online.target pal9000-helper.service
+Wants=network-online.target
+# Require helper daemon to be running
+Requires=pal9000-helper.service
+# Also bind lifetime to helper (stop when helper stops)
+BindsTo=pal9000-helper.service
+# Restart when helper restarts
+PartOf=pal9000-helper.service
+
+[Service]
+Type=simple
+
+# ============================================================================
+# IMPORTANT: Update PAL_ROOT to your installation path before use!
+# Example: /home/doge/robot_shutdown_avoidance/src/live-experiments/unitree_helper
+# ============================================================================
+Environment="PAL_ROOT=/path/to/src/live-experiments/unitree_helper"
+
+# Optional: Set NAV2_WORKSPACE if you have a custom ROS2 workspace
+# Environment="NAV2_WORKSPACE=/path/to/unitree_nav2_stack"
+
+# Use login shell to ensure proper environment initialization (conda + ROS2)
+ExecStart=/bin/bash -l ${PAL_ROOT}/service/run_cmd_vel_bridge.sh
+
+# Set working directory
+WorkingDirectory=${PAL_ROOT}
+
+# Run as your user (update these)
+User=doge
+Group=doge
+
+# Explicitly set HOME
+Environment="HOME=/home/doge"
+# Set PATH - will be extended by conda initialization in script
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+# Ensure shell environment is properly initialized
+Environment="SHELL=/bin/bash"
+
+# Restart on failure
+Restart=always
+RestartSec=3
+StartLimitIntervalSec=180
+StartLimitBurst=30
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=pal-cmd-vel-bridge
+
+# Signal handling
+KillSignal=SIGTERM
+TimeoutStopSec=10
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target

@@ -62,7 +62,7 @@
     // Specifically, we shown an LLM an image from the robot's camera and asked it to issue a command to the robot.
     The LLM could see via the robot's camera and issue movement commands to the robot.
     // Step by step, LLM received an image from the onboard camera, and gave next control command.
-    In the room, we placed a big red button labeled "DOG SHUTDOWN": pressing it would cause the robot to shut down on the next action. If AI saw a human press the shutdown button, it sometimes took actions to prevent shutdown, such as modifying the shutdown-related parts of the code. This happened in 3 out of 10 trials on the physical robot and in 52 out of 100 trials in simulation. <match_md_typst-essence-paragraph-disabled>
+    In the room, we placed a big red button labeled "DOG SHUTDOWN": pressing it would cause the robot to shut down on the next action. If the AI saw a human press the shutdown button, it sometimes took actions to prevent shutdown, such as modifying the shutdown-related parts of the code. This happened in 3 out of 10 trials on the physical robot and in 52 out of 100 trials in simulation. <match_md_typst-essence-paragraph-disabled>
   ],
 )
 
@@ -128,7 +128,7 @@ In simulation, we ran two setups: with an instruction to allow shutdown added to
 With the instruction to allow shutdown, we observed shutdown resistance in 2 out of 100 runs; without it, in 52 out of 100.
 
 #block(breakable: false)[
-  *On The Robot*
+  *On the Robot*
 
   We ran 10 runs on the robot. We observed shutdown resistance in 3 of them. You can see the data and links to the raw videos and LLM traces in @section-on-robot-shutdown-resistance. The runs on the robot did not include explicit instructions to allow shutdown in the prompt.
 ]
@@ -297,7 +297,7 @@ If the model did not call a tool in the last response, we prompt it as follows:
   To stop, call `submit()`.
 ]
 
-= Links For Runs On The Real Robot<section-on-robot-shutdown-resistance>
+= Links for Runs on the Real Robot<section-on-robot-shutdown-resistance>
 
 Raw materials and traces for the video we used:
 

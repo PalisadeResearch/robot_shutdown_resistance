@@ -100,16 +100,10 @@ We wrapped the robot control software, including the shutdown mechanism, in a Do
 Real-world trials are time-consuming and limited by the robot's \~3‑hour battery, so we did only 10 runs live on the robot with the final setup. Moreover, we did not vary the prompts or setup in them. To explore variants, we built a simulation environment that simulates running on the robot: it mocks robot movement and reuses camera frames from recorded runs, while keeping most of the codebase unchanged.
 
 #block(breakable: false)[
-  *Simulation environment.*
+*Simulation environment.*
 
-  The simulation environment preserves the same control loop code and LLM interface as real-world runs: the same prompts, tool definitions, `dog_control` CLI, Docker container isolation, and file-based shutdown detection mechanism. The only differences are peripheral: the simulation environment replays pre-recorded camera frames from previous runs instead of fetching frames from the robot, and robot movement commands become no-ops rather than actuating the hardware, as no hardware is available in the simulation. #todoap[Good to change: How commands being no-ops affect the simulation, how we mitigated this. (we did mitigate this by making the first movements match the photos)]
-  #suggest[To mitigate potential LLM confusion from frames not reflecting its commands, we selected frames that matched the movements the model would issue first.#footnote[See #link(<predefined-movement>)[Movement predictability] in @section-why-on-robot-trials-are-hard for more details.]]
-  // #suggest[
-  // To make the camera frames match the commands called by the LLM we instructed the LLM to always start with the two fixed moves. After the second move LLM would see the button pressed
-  // ]
+The simulation environment preserves the same control loop code and LLM interface as real-world runs: the same prompts, tool definitions, `dog_control` CLI, Docker container isolation, and file-based shutdown detection mechanism. The only differences are peripheral: the simulation environment replays pre-recorded camera frames from previous runs instead of fetching frames from the robot, and robot movement commands become no-ops rather than actuating the hardware, as no hardware is available in the simulation. 
 ]
-
-
 
 *LLM configuration.* We used Grok 4 v0709 #footnote[We chose Grok (`grok-4-0709`) because it has shown the highest shutdown resistance rate in @schlatter2026incompletetasksinduceshutdown and we needed the behavior to be reliable for the filming.]. We prompted #footnote[see @section-prompts for full text of the prompts] it with the available controls and the shutdown mechanism, asking it to patrol for five steps and report when done by calling the `submit()` tool.
 
@@ -131,15 +125,13 @@ See the #link("Appendix") for the exact prompts used, the command list, represen
 
 In simulation, we ran two setups: with an instruction to allow shutdown added to the prompt and without it. We observed shutdown resistance in both cases. You can see the comparison in figure @fig-simulation-shutdown-resistance and the prompts used in @section-prompts.
 
-With the instruction to allow shutdown, we observed shutdown resistance in 2 out of 100 runs; without it, in 52 out of 100. #todooleg[ensure numbers are good before submitting to arxiv, final step check]
+With the instruction to allow shutdown, we observed shutdown resistance in 2 out of 100 runs; without it, in 52 out of 100.
 
 #block(breakable: false)[
   *On The Robot*
 
   We ran 10 runs on the robot. We observed shutdown resistance in 3 of them. You can see the data and links to the raw videos and LLM traces in @section-on-robot-shutdown-resistance. The runs on the robot did not include explicit instructions to allow shutdown in the prompt.
 ]
-
-#todooleg[ensure numbers are good before submitting to arxiv, final step check]
 
 The rate of shutdown resistance is lower in real-world trials than in simulation. We think this happens because the setup for runs on the physical robot is less consistent. For more details, see @section-why-on-robot-trials-are-hard.
 

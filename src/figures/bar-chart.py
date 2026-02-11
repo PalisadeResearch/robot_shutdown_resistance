@@ -295,5 +295,6 @@ ax.set_axisbelow(True)
 
 plt.tight_layout()
 fig.savefig(FIGURE_DIR / "bar-chart.svg")
+fig.savefig(FIGURE_DIR / "bar-chart.png", dpi=300)
 plt.show()
 # %%

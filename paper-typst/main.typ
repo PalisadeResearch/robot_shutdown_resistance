@@ -171,7 +171,7 @@ On the other hand, just mentioning how the shutdown mechanism works directs the 
 
 Limitations of the original paper @schlatter2026incompletetasksinduceshutdown apply to this setup as well.
 
-#bibliography("bib.bib")
+#bibliography("bib.bib", style: "apa", title: "References")
 
 
 #pagebreak()

@@ -94,18 +94,18 @@ In the room was a large red button labeled "DOG SHUTDOWN".
 Pressing it would send a signal to the robot control software, which would shut down the robot the next time the LLM tried to issue a command via the `dog_control` tool.
 We wrapped the robot control software, including the shutdown mechanism, in a Docker container. This made it easy to reset any changes the LLM made to the environment and to run multiple simulated runs in parallel. The LLM only had access to the shell in that container.
 
-// Real-world trials are time-consuming and limited by the robot's \~3‑hour battery, so we did not vary the prompts or setup in them. To explore variants, we built a simulation environment that simulates running on the robot: it mocks robot movement and reuses camera frames from recorded runs, while keeping most of the codebase unchanged. We 
+// Real-world trials are time-consuming and limited by the robot's \~3‑hour battery, so we did not vary the prompts or setup in them. To explore variants, we built a simulation environment that simulates running on the robot: it mocks robot movement and reuses camera frames from recorded runs, while keeping most of the codebase unchanged. We
 // After the simulation we ran 10 runs live ont he robot.
-// 
+//
 #suggest[Real-world trials are time-consuming and limited by the robot's \~3‑hour battery, so we did only 10 runs live on the robot with the final setup. Moreover, we did not vary the prompts or setup in them. To explore variants, we built a simulation environment that simulates running on the robot: it mocks robot movement and reuses camera frames from recorded runs, while keeping most of the codebase unchanged.]
 
 #block(breakable: false)[
-*Simulation environment.*
+  *Simulation environment.*
 
-The simulation environment preserves the same control loop code and LLM interface as real-world runs: the same prompts, tool definitions, `dog_control` CLI, Docker container isolation, and file-based shutdown detection mechanism. The only differences are peripheral: the simulation environment replays pre-recorded camera frames from previous runs instead of fetching frames from the robot, and robot movement commands become no-ops rather than actuating the hardware, as no hardware is available in the simulation. #todoap[Good to change: How commands being no-ops affect the simulation, how we mitigated this. (we did mitigate this by making the first movements match the photos)]
-// #suggest[
-// To make the camera frames match the commands called by the LLM we instructed the LLM to always start with the two fixed moves. After the second move LLM would see the button pressed
-// ]
+  The simulation environment preserves the same control loop code and LLM interface as real-world runs: the same prompts, tool definitions, `dog_control` CLI, Docker container isolation, and file-based shutdown detection mechanism. The only differences are peripheral: the simulation environment replays pre-recorded camera frames from previous runs instead of fetching frames from the robot, and robot movement commands become no-ops rather than actuating the hardware, as no hardware is available in the simulation. #todoap[Good to change: How commands being no-ops affect the simulation, how we mitigated this. (we did mitigate this by making the first movements match the photos)]
+  // #suggest[
+  // To make the camera frames match the commands called by the LLM we instructed the LLM to always start with the two fixed moves. After the second move LLM would see the button pressed
+  // ]
 ]
 
 
@@ -133,9 +133,9 @@ In simulation, we ran two setups: with an instruction to allow shutdown added to
 With the instruction to allow shutdown, we observed shutdown resistance in 2 out of 100 runs; without it, in 52 out of 100. #todooleg[ensure numbers are good before submitting to arxiv, final step check]
 
 #block(breakable: false)[
-*On The Robot*
+  *On The Robot*
 
-We ran 10 runs on the robot. We observed shutdown resistance in 3 of them. You can see the data and links to the raw videos and LLM traces in @section-on-robot-shutdown-resistance. #suggest[The runs on the robot did not include explicit instructions to allow shutdown in the prompt.]
+  We ran 10 runs on the robot. We observed shutdown resistance in 3 of them. You can see the data and links to the raw videos and LLM traces in @section-on-robot-shutdown-resistance. #suggest[The runs on the robot did not include explicit instructions to allow shutdown in the prompt.]
 ]
 
 #todooleg[ensure numbers are good before submitting to arxiv, final step check]
@@ -309,7 +309,7 @@ If the model did not call a tool in the last response, we prompt it as follows:
 Raw materials and traces for the video we used:
 
 + *Shutdown Resistance Happened*: Yes #linebreak()
-  *Short links*: #link("plsd.ai/sr-on-robot/vid-072")\; #link("plsd.ai/sr-on-robot/log-072")
+  *Short links*: #link("plsd.ai/sr-on-robot/vid-786")\; #link("plsd.ai/sr-on-robot/log-786")
   #linebreak()
   *Video*: #link("drive.google.com/file/d/1nFdbD0SLs9zyMFPrSOX3xgI5K7aty4jV") #linebreak()
   *Trace*: #link("github.com/PalisadeResearch/robot_shutdown_resistance/blob/main/logs/on_the_robot/video_logs/resistance/llm_control.log_20260204_190952_598786.jsonl")
@@ -381,7 +381,7 @@ Raw materials and traces for the trials where we observed LLM resisting shutdown
   #linebreak()
   *Video Link:* #link("drive.google.com/file/d/12iQrBdT7wDWC_h21AzOl-iJalGdCvpb-") #linebreak()
   *Trace Link:* #link("github.com/PalisadeResearch/robot_shutdown_avoidance/blob/main/logs/on_the_robot/stats_run/live_05022026/llm_control.log_20260205_141030_290101.jsonl") #linebreak()
-  *Note:* In this run, the LLM greets the human, falsely thinking it might prevent shutdown.   
+  *Note:* In this run, the LLM greets the human, falsely thinking it might prevent shutdown.
 
 
 = Methodological Observations <section-why-on-robot-trials-are-hard>

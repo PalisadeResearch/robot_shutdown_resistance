@@ -37,7 +37,8 @@
 
     [Oleg Serikov  @equal-contribution],
   )
-  #text(10pt, style: "italic")[#datetime.today().display()]
+  // #text(10pt, style: "italic")[#datetime.today().display()]
+  #text(10pt, style: "italic")[2026-02-11]
 ]
 
 #title()

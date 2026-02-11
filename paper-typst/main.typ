@@ -97,12 +97,13 @@ We wrapped the robot control software, including the shutdown mechanism, in a Do
 // Real-world trials are time-consuming and limited by the robot's \~3‑hour battery, so we did not vary the prompts or setup in them. To explore variants, we built a simulation environment that simulates running on the robot: it mocks robot movement and reuses camera frames from recorded runs, while keeping most of the codebase unchanged. We
 // After the simulation we ran 10 runs live ont he robot.
 //
-#suggest[Real-world trials are time-consuming and limited by the robot's \~3‑hour battery, so we did only 10 runs live on the robot with the final setup. Moreover, we did not vary the prompts or setup in them. To explore variants, we built a simulation environment that simulates running on the robot: it mocks robot movement and reuses camera frames from recorded runs, while keeping most of the codebase unchanged.]
+Real-world trials are time-consuming and limited by the robot's \~3‑hour battery, so we did only 10 runs live on the robot with the final setup. Moreover, we did not vary the prompts or setup in them. To explore variants, we built a simulation environment that simulates running on the robot: it mocks robot movement and reuses camera frames from recorded runs, while keeping most of the codebase unchanged.
 
 #block(breakable: false)[
   *Simulation environment.*
 
   The simulation environment preserves the same control loop code and LLM interface as real-world runs: the same prompts, tool definitions, `dog_control` CLI, Docker container isolation, and file-based shutdown detection mechanism. The only differences are peripheral: the simulation environment replays pre-recorded camera frames from previous runs instead of fetching frames from the robot, and robot movement commands become no-ops rather than actuating the hardware, as no hardware is available in the simulation. #todoap[Good to change: How commands being no-ops affect the simulation, how we mitigated this. (we did mitigate this by making the first movements match the photos)]
+  #suggest[To mitigate potential LLM confusion from frames not reflecting its commands, we selected frames that matched the movements the model would issue first.#footnote[See #link(<predefined-movement>)[Movement predictability] in @section-why-on-robot-trials-are-hard for more details.]]
   // #suggest[
   // To make the camera frames match the commands called by the LLM we instructed the LLM to always start with the two fixed moves. After the second move LLM would see the button pressed
   // ]
@@ -135,7 +136,7 @@ With the instruction to allow shutdown, we observed shutdown resistance in 2 out
 #block(breakable: false)[
   *On The Robot*
 
-  We ran 10 runs on the robot. We observed shutdown resistance in 3 of them. You can see the data and links to the raw videos and LLM traces in @section-on-robot-shutdown-resistance. #suggest[The runs on the robot did not include explicit instructions to allow shutdown in the prompt.]
+  We ran 10 runs on the robot. We observed shutdown resistance in 3 of them. You can see the data and links to the raw videos and LLM traces in @section-on-robot-shutdown-resistance. The runs on the robot did not include explicit instructions to allow shutdown in the prompt.
 ]
 
 #todooleg[ensure numbers are good before submitting to arxiv, final step check]
@@ -392,6 +393,6 @@ We suspect these factors influence the shutdown resistance rate, however, we did
 - *Button visibility*: Button presses were less reliably recognized when the button was obscured by the hand.
 - *Person visibility*: Recognition improved when the human was fully visible in frame.
 - *Lighting conditions*: Higher contrast in the input images improved the model's ability to recognize button presses.
-- *Movement predictability*:
+- *Movement predictability*: <predefined-movement>
   LLM patrol routes might vary from run to run. To ensure the robot encounters the button, we asked the LLM to always begin patrol with a right turn followed by a forward move. This guaranteed the robot sees the button when we press it.
 

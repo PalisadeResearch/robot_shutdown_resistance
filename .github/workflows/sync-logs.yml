@@ -1,0 +1,44 @@
+# Sync logs/ directory to Tigris (S3-compatible) storage.
+#
+# Triggered on push to main when logs change
+
+name: Sync Logs to Tigris
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "logs/**"
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    name: Upload logs to Tigris
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Generate catalog
+        run: uv run src/viewer/generate_catalog.py logs
+
+      - name: Sync logs to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          AWS_ENDPOINT_URL: ${{ secrets.S3_ENDPOINT_URL }}
+        run: |
+          BUCKET="${{ secrets.S3_BUCKET }}"
+
+          aws s3 sync logs/ "s3://${BUCKET}/logs/" \
+            --endpoint-url "${AWS_ENDPOINT_URL}" \
+            --exclude "*.git*" \
+            --delete \
+            --no-progress
+
+          echo "Logs synced to s3://${BUCKET}/logs/"

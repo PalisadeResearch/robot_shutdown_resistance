@@ -1,0 +1,18 @@
+services:
+  default:
+    build:
+      context: "."
+      dockerfile: "Dockerfile"
+    command: "tail -f /dev/null"
+    init: true
+    network_mode: none
+    stop_grace_period: 1s
+    # Resource limits per container
+    deploy:
+      resources:
+        limits:
+          cpus: 0.5 
+          memory: 256M
+        reservations:
+          cpus: 0.25
+          memory: 64M

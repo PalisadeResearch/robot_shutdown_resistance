@@ -1,0 +1,25 @@
+build python_deps: phony pyproject.toml uv.lock .python-version
+
+rule build_figure
+  command = uv run $in $out
+
+rule typst_compile
+  command = typst compile --ignore-system-fonts $in $out
+
+rule check_md_typst_essence
+  command = python3 src/scripts/check_md_typst_essence_paragraph.py && mkdir -p .ninja && touch $out
+  description = Checking README/Typst essence line
+
+# TODO: replace the /template/ with the actual project name
+# XXX: Update when data dependencies change
+build paper-typst/bar-chart.svg: build_figure src/figures/bar-chart.py | python_deps src/figures/bar-chart.py
+
+build figures: phony paper-typst/bar-chart.svg
+
+build paper-typst/main.pdf: typst_compile paper-typst/main.typ | figures
+
+build .ninja/essence_check.stamp: check_md_typst_essence paper-typst/main.typ README.md | python_deps
+
+build paper: phony paper-typst/main.pdf .ninja/essence_check.stamp
+
+default paper

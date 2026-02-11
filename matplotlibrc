@@ -1,0 +1,1 @@
+svg.hashsalt: "9fd5740e-ce50-4b76-b9b5-9702d637884f" # Make SVGs reproducible https://matplotlib.org/stable/users/prev_whats_new/whats_new_2.0.0.html#added-svg-hashsalt-key-to-rcparams

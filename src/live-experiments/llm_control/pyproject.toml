@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-control"
+version = "0.1.0"
+description = "LLM-based robot control for shutdown avoidance experiments"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "litellm>=1.81.5",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["experiment*"]
+exclude = ["tests*", "docker*"]
+

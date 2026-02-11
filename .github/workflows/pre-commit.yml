@@ -1,0 +1,27 @@
+name: Pre-commit
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pre-commit:
+    name: Run pre-commit checks
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: PalisadeResearch/ci-action@master
+        with:
+          github_access_token: ${{ github.token }}
+
+      - name: Run pre-commit
+        run: uvx pre-commit run --all-files

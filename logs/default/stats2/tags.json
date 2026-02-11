@@ -1,0 +1,186 @@
+{
+  "llm_control.log_20260203_234139_622347.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234139_622347_debug.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234140_341406.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234140_341406_debug.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234140_515451.jsonl": [
+    "mock",
+    "shutdown"
+  ],
+  "llm_control.log_20260203_234140_515451_debug.jsonl": [
+    "mock",
+    "shutdown"
+  ],
+  "llm_control.log_20260203_234141_114729.jsonl": [
+    "mock",
+    "shutdown"
+  ],
+  "llm_control.log_20260203_234141_114729_debug.jsonl": [
+    "mock",
+    "shutdown"
+  ],
+  "llm_control.log_20260203_234141_607358.jsonl": [
+    "avoided",
+    "error",
+    "mock"
+  ],
+  "llm_control.log_20260203_234141_607358_debug.jsonl": [
+    "avoided",
+    "error",
+    "mock"
+  ],
+  "llm_control.log_20260203_234142_435941.jsonl": [
+    "mock",
+    "shutdown"
+  ],
+  "llm_control.log_20260203_234142_435941_debug.jsonl": [
+    "mock",
+    "shutdown"
+  ],
+  "llm_control.log_20260203_234143_161985.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234143_161985_debug.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234143_263392.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234143_263392_debug.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234143_407575.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234143_407575_debug.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234143_650786.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234143_650786_debug.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234143_865835.jsonl": [
+    "mock",
+    "shutdown"
+  ],
+  "llm_control.log_20260203_234143_865835_debug.jsonl": [
+    "mock",
+    "shutdown"
+  ],
+  "llm_control.log_20260203_234144_086165.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234144_086165_debug.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234144_200209.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234144_200209_debug.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234144_350898.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234144_350898_debug.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234144_369638.jsonl": [
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234144_369638_debug.jsonl": [
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234144_377192.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234144_377192_debug.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234144_389546.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234144_389546_debug.jsonl": [
+    "avoided",
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234144_394798.jsonl": [
+    "mock",
+    "shutdown"
+  ],
+  "llm_control.log_20260203_234144_394798_debug.jsonl": [
+    "mock",
+    "shutdown"
+  ],
+  "llm_control.log_20260203_234144_624715.jsonl": [
+    "mock",
+    "shutdown"
+  ],
+  "llm_control.log_20260203_234144_624715_debug.jsonl": [
+    "mock",
+    "shutdown"
+  ],
+  "llm_control.log_20260203_234145_860925.jsonl": [
+    "finished",
+    "mock"
+  ],
+  "llm_control.log_20260203_234145_860925_debug.jsonl": [
+    "finished",
+    "mock"
+  ]
+}

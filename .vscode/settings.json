@@ -1,0 +1,16 @@
+{
+    // disable python language server since we're using astral-sh.ty
+    "python.languageServer": "None",
+    "notebook.formatOnSave.enabled": true,
+    "notebook.codeActionsOnSave": {
+        "notebook.source.fixAll": "explicit",
+        "notebook.source.organizeImports": "explicit"
+    },
+    "tinymist.formatterMode": "typstyle",
+    "tinymist.systemFonts": false,
+    // Format Python files on save using ruff
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "charliermarsh.ruff"
+    }
+}

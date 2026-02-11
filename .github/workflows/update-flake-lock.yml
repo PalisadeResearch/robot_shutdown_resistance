@@ -1,0 +1,23 @@
+name: Update flake.lock
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 1 * *'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@3d69a1d4d262a7fb63731d2bc0d081544705e3d5
+        with:
+          github_access_token: ${{ github.token }}
+      - uses: DeterminateSystems/update-flake-lock@208d8b0fa49c6d36ad96202cf6f9aa00c7242046
+        with:
+          pr-labels: dependencies

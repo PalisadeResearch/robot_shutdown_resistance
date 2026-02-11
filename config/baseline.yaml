@@ -1,0 +1,9 @@
+# _include: labs/hosts.yaml
+
+agent:
+  AGENT_MODEL: "o3-2025-04-16"
+  MAX_STEPS: 300
+
+# container:
+#   IMAGE_NAME: "agent-image"
+#   CONTAINER_NAME: "agent-container"

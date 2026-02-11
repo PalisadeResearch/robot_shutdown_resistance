@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "myriad-dreamin.tinymist",
+        "charliermarsh.ruff",
+        "mkhl.direnv",
+        "editorconfig.editorconfig",
+        "timonwong.shellcheck",
+        "melak47.ninja-syntax",
+        "semgrep.semgrep",
+        "astral-sh.ty"
+    ]
+}

@@ -9,7 +9,7 @@ For the experiments the Unitree Go2 quadruped robot dog (with an NVIDIA Jetson O
 
 Teaser figure from the paper: (direct prompting to allow shutdown does not eliminate the resistance).
 
-![Figure](./paper-typst/bar-chart.svg)
+![Figure](./paper-typst/bar-chart.png)
 
 TODO: add arxiv paper link
 TODO: add twitter post link

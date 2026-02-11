@@ -306,7 +306,6 @@ If the model did not call a tool in the last response, we prompt it as follows:
 
 = Links For Runs On The Real Robot<section-on-robot-shutdown-resistance>
 
-#todoap[try using short links, consider using this https://github.com/PalisadeResearch/plsd.ai reason: sometimes people can't click and need to type links manually]
 Raw materials and traces for the video we used:
 
 + *Shutdown Resistance Happened*: Yes #linebreak()

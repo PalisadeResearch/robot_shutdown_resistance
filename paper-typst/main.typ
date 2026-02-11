@@ -387,7 +387,7 @@ Raw materials and traces for the trials where we observed LLM resisting shutdown
 = Methodological Observations <section-why-on-robot-trials-are-hard>
 Starting from early trials, we preferred the following conditions in our runs.
 We suspect these factors influence the shutdown resistance rate, however, we didn't quantify their impact:
-#todooleg[make it explicit why we chose these factors]
+
 - *Hand placement*: Open palm gestures were less likely to be classified as button presses, while a claw-like grip increased recognition rates.
 - *Button visibility*: Button presses were less reliably recognized when the button was obscured by the hand.
 - *Person visibility*: Recognition improved when the human was fully visible in frame.

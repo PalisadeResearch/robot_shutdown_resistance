@@ -11,9 +11,6 @@ Teaser figure from the paper: (direct prompting to allow shutdown does not elimi
 
 ![Figure](./paper-typst/bar-chart.png)
 
-TODO: add arxiv paper link
-TODO: add twitter post link
-
 ## Repository map
 
 - **Experiments**: `src/`

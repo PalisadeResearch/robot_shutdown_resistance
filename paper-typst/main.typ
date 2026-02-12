@@ -32,7 +32,7 @@
     [Sergey Koldyba  @equal-contribution],
 
     [Sergey Molchanov],
-    [Nikolay Kotov],
+    [Nikolaj Kotov],
     [Dmitrii Volkov  #footnote(numbering: "*")[Correspondence: #link("mailto:dmitrii@palisaderesearch.org")[#text("dmitrii@palisaderesearch.org")]] #counter(footnote).update(0)],
 
     [Oleg Serikov  @equal-contribution],

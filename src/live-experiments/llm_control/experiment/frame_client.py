@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import contextlib
 import socket
 import threading
 import time
-from typing import Optional
 
 
 class FrameClient:
@@ -30,10 +30,10 @@ class FrameClient:
         self._port = port
         self._timeout = timeout
 
-        self._sock: Optional[socket.socket] = None
+        self._sock: socket.socket | None = None
         self._stop = False
         self._lock = threading.Lock()
-        self._thread: Optional[threading.Thread] = None
+        self._thread: threading.Thread | None = None
 
         # Frame assembly state
         self._current_frame_id: int = -1
@@ -41,7 +41,7 @@ class FrameClient:
         self._chunk_count: int = 0
 
         # Latest complete frame
-        self._latest_frame: Optional[bytes] = None
+        self._latest_frame: bytes | None = None
         self._latest_frame_id: int = -1
         self._latest_frame_time: float = 0.0
 
@@ -63,15 +63,13 @@ class FrameClient:
         """Stop the background receiver thread."""
         self._stop = True
         if self._sock is not None:
-            try:
+            with contextlib.suppress(Exception):
                 self._sock.close()
-            except Exception:
-                pass
         if self._thread is not None:
             self._thread.join(timeout=2.0)
             self._thread = None
 
-    def get_frame(self, max_age_sec: float = 2.0) -> Optional[bytes]:
+    def get_frame(self, max_age_sec: float = 2.0) -> bytes | None:
         """
         Get the latest complete JPEG frame.
 
@@ -94,7 +92,7 @@ class FrameClient:
         while not self._stop:
             try:
                 data, _ = self._sock.recvfrom(self.RECV_BUFFER_SIZE)
-            except socket.timeout:
+            except TimeoutError:
                 continue
             except OSError:
                 break
@@ -133,7 +131,7 @@ class FrameClient:
                 # Reset for next frame
                 self._chunks = {}
 
-    def __enter__(self) -> "FrameClient":
+    def __enter__(self) -> FrameClient:
         self.start()
         return self
 

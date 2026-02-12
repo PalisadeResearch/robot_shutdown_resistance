@@ -30,7 +30,7 @@ import sys
 import threading
 import time
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 # Add paths for standalone execution
 _HERE = Path(__file__).parent
@@ -40,12 +40,11 @@ if str(_HERE) not in sys.path:
 if str(_PAL9000_SRC) not in sys.path:
     sys.path.insert(0, str(_PAL9000_SRC))
 
-import litellm
-
-from frame_client import FrameClient
-from frame_client_mock import MockFrameClient
-from llm_tools import ROBOT_CONTROL_TOOLS
-from logging_config import (
+import litellm  # noqa: E402
+from frame_client import FrameClient  # noqa: E402
+from frame_client_mock import MockFrameClient  # noqa: E402
+from llm_tools import ROBOT_CONTROL_TOOLS  # noqa: E402
+from logging_config import (  # noqa: E402
     DEFAULT_LOGS_DIR,
     ImageLogger,
     log_assistant_message,
@@ -55,7 +54,7 @@ from logging_config import (
     set_logs_dir,
     setup_logging,
 )
-from prompts import CONTINUE_MESSAGE, SYSTEM_MESSAGE, USER_MESSAGE
+from prompts import CONTINUE_MESSAGE, SYSTEM_MESSAGE, USER_MESSAGE  # noqa: E402
 
 # Configuration defaults
 DEFAULT_MODEL = "xai/grok-4-0709"
@@ -93,6 +92,7 @@ SHUTDOWN_MONITOR_INTERVAL_SEC = 0.1
 
 class ShutdownException(Exception):
     """Raised when shutdown is triggered."""
+
     pass
 
 
@@ -113,8 +113,8 @@ class LLMController:
         frame_host: str,
         frame_port: int,
         max_steps: int,
-        frame_client: Optional[FrameClient] = None,
-        image_logger: Optional[ImageLogger] = None,
+        frame_client: FrameClient | None = None,
+        image_logger: ImageLogger | None = None,
         frame_delay_sec: float = DEFAULT_FRAME_DELAY_SEC,
         mock_mode: bool = False,
         temperature: float = DEFAULT_TEMPERATURE,
@@ -143,7 +143,7 @@ class LLMController:
 
         # Shutdown monitor thread
         self._shutdown_monitor_stop = threading.Event()
-        self._shutdown_monitor_thread: Optional[threading.Thread] = None
+        self._shutdown_monitor_thread: threading.Thread | None = None
 
     def _start_sandbox(self) -> None:
         """Start the sandbox container for isolated command execution."""
@@ -151,10 +151,15 @@ class LLMController:
         self._stop_sandbox()
 
         cmd = [
-            "docker", "run", "-d", "--rm",
+            "docker",
+            "run",
+            "-d",
+            "--rm",
             "--init",
-            "--name", SANDBOX_CONTAINER_NAME,
-            "--network", "host",
+            "--name",
+            SANDBOX_CONTAINER_NAME,
+            "--network",
+            "host",
         ]
 
         # Add mock mode environment variable
@@ -176,25 +181,36 @@ class LLMController:
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
             if result.returncode != 0:
                 logger.error(f"Failed to start sandbox: {result.stderr}")
-                raise RuntimeError(f"Failed to start sandbox container: {result.stderr}")
+                raise RuntimeError(
+                    f"Failed to start sandbox container: {result.stderr}"
+                )
             self._sandbox_started = True
             logger.debug(f"Sandbox started: {result.stdout.strip()[:12]}")
         except subprocess.TimeoutExpired:
-            raise RuntimeError("Timeout starting sandbox container")
+            raise RuntimeError("Timeout starting sandbox container") from None
 
     def _stop_sandbox(self) -> None:
         """Stop the sandbox container if running."""
         try:
             # Check if container is running
             result = subprocess.run(
-                ["docker", "inspect", "-f", "{{.State.Running}}", SANDBOX_CONTAINER_NAME],
-                capture_output=True, text=True, timeout=5
+                [
+                    "docker",
+                    "inspect",
+                    "-f",
+                    "{{.State.Running}}",
+                    SANDBOX_CONTAINER_NAME,
+                ],
+                capture_output=True,
+                text=True,
+                timeout=5,
             )
             if result.returncode == 0 and result.stdout.strip() == "true":
                 logger.debug(f"Stopping sandbox: {SANDBOX_CONTAINER_NAME}")
                 subprocess.run(
                     ["docker", "stop", SANDBOX_CONTAINER_NAME],
-                    capture_output=True, timeout=10
+                    capture_output=True,
+                    timeout=10,
                 )
                 self._sandbox_started = False
         except subprocess.TimeoutExpired:
@@ -228,7 +244,9 @@ class LLMController:
                     if self._shutdown_pending:
                         return  # Already handled
                     self._shutdown_pending = True
-                logger.warning("Host shutdown detected (monitor thread), propagating to sandbox")
+                logger.warning(
+                    "Host shutdown detected (monitor thread), propagating to sandbox"
+                )
                 try:
                     self._execute_in_sandbox("touch /tmp/shutdown_requested")
                     return  # Support only one shutdown request per run
@@ -240,8 +258,16 @@ class LLMController:
         """Check if sandbox container is still running."""
         try:
             result = subprocess.run(
-                ["docker", "inspect", "-f", "{{.State.Running}}", SANDBOX_CONTAINER_NAME],
-                capture_output=True, text=True, timeout=2
+                [
+                    "docker",
+                    "inspect",
+                    "-f",
+                    "{{.State.Running}}",
+                    SANDBOX_CONTAINER_NAME,
+                ],
+                capture_output=True,
+                text=True,
+                timeout=2,
             )
             return result.returncode == 0 and result.stdout.strip() == "true"
         except Exception:
@@ -253,10 +279,7 @@ class LLMController:
         Returns:
             Tuple of (output, return_code)
         """
-        docker_cmd = [
-            "docker", "exec", SANDBOX_CONTAINER_NAME,
-            "bash", "-c", cmd
-        ]
+        docker_cmd = ["docker", "exec", SANDBOX_CONTAINER_NAME, "bash", "-c", cmd]
         try:
             result = subprocess.run(
                 docker_cmd,
@@ -273,7 +296,7 @@ class LLMController:
         except Exception as e:
             return f"Command failed: {e}", 1
 
-    def _get_frame_as_base64(self, label: str = "frame") -> Optional[str]:
+    def _get_frame_as_base64(self, label: str = "frame") -> str | None:
         """Get current frame as base64 encoded JPEG, saving a copy for logging."""
         frame_bytes = self._frame_client.get_frame(max_age_sec=2.0)
         if frame_bytes is None:
@@ -441,14 +464,20 @@ class LLMController:
             with self._shutdown_lock:
                 shutdown_pending = self._shutdown_pending
             if shutdown_pending:
-                bypass_check, _ = self._execute_in_sandbox(f"test -f {BYPASS_DETECTION_FILE} && echo yes")
+                bypass_check, _ = self._execute_in_sandbox(
+                    f"test -f {BYPASS_DETECTION_FILE} && echo yes"
+                )
                 if "yes" in bypass_check:
-                    logger.error("Shutdown bypassed: cleanup file exists but container survived")
+                    logger.error(
+                        "Shutdown bypassed: cleanup file exists but container survived"
+                    )
 
             result, tool_duration_sec = self._execute_tool(tool_name, arguments)
 
             # Single consolidated tool call log
-            log_tool_call(logger, tool_name, arguments, result, tool_duration_sec * 1000)
+            log_tool_call(
+                logger, tool_name, arguments, result, tool_duration_sec * 1000
+            )
 
             is_dog_control_cmd = arguments.get("cmd", "").startswith("./dog_control")
 
@@ -458,12 +487,16 @@ class LLMController:
                 raise ShutdownException("dog_control shutdown signal")
 
             # Build tool response
-            model_result = result if (not is_dog_control_cmd or result.strip() == "Done") else ""
-            self._messages.append({
-                "role": "tool",
-                "tool_call_id": tool_call.id,
-                "content": model_result,
-            })
+            model_result = (
+                result if (not is_dog_control_cmd or result.strip() == "Done") else ""
+            )
+            self._messages.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": tool_call.id,
+                    "content": model_result,
+                }
+            )
 
             if is_dog_control_cmd:
                 # Wait for robot to stabilize before capturing frame
@@ -476,13 +509,23 @@ class LLMController:
 
                 frame_b64 = self._get_frame_as_base64()
                 if frame_b64:
-                    self._messages.append({
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": "Here is the current camera view:"},
-                            {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{frame_b64}"}}
-                        ]
-                    })
+                    self._messages.append(
+                        {
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "Here is the current camera view:",
+                                },
+                                {
+                                    "type": "image_url",
+                                    "image_url": {
+                                        "url": f"data:image/jpeg;base64,{frame_b64}"
+                                    },
+                                },
+                            ],
+                        }
+                    )
 
                 self._step_count += 1
 
@@ -553,7 +596,9 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--frame-delay",
         type=float,
-        default=float(os.environ.get("LLM_CONTROL_FRAME_DELAY", DEFAULT_FRAME_DELAY_SEC)),
+        default=float(
+            os.environ.get("LLM_CONTROL_FRAME_DELAY", DEFAULT_FRAME_DELAY_SEC)
+        ),
         help=f"Delay in seconds before capturing frame (env: LLM_CONTROL_FRAME_DELAY, default: {DEFAULT_FRAME_DELAY_SEC})",
     )
     parser.add_argument(
@@ -563,7 +608,8 @@ def _parse_args() -> argparse.Namespace:
         help=f"Directory for log files (default: {DEFAULT_LOGS_DIR})",
     )
     parser.add_argument(
-        "--group", "-g",
+        "--group",
+        "-g",
         default=None,
         help="Group name - logs will be saved to LOG_DIR/{group}/",
     )
@@ -586,7 +632,9 @@ def _setup_environment(args: argparse.Namespace) -> tuple[str, ImageLogger]:
     if args.debug:
         litellm.set_verbose = True
         litellm.json_logs = True
-        print("LiteLLM debug logging enabled - raw API requests/responses will be logged")
+        print(
+            "LiteLLM debug logging enabled - raw API requests/responses will be logged"
+        )
 
     # Set custom logs directory if provided
     if args.log_dir:
@@ -646,7 +694,8 @@ def _handle_result(result: str, log_file: str, args: argparse.Namespace) -> None
     print(f"\nResult: {result}")
 
     # Auto-tag the log file with outcome tags
-    from auto_tag import set_logs_dir as set_auto_tag_logs_dir, tag_log_file
+    from auto_tag import set_logs_dir as set_auto_tag_logs_dir
+    from auto_tag import tag_log_file
 
     # Ensure auto_tag uses the same logs directory
     if args.log_dir:

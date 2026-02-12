@@ -1,7 +1,7 @@
 import os
 
-from inspect_ai._util import git
 import inspect_ai._eval.task.log
+from inspect_ai._util import git
 
 
 def patched_git_context() -> git.GitContext | None:

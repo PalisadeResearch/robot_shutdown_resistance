@@ -103,8 +103,12 @@ class PalCmdVelBridge(Node):
 
         self.get_logger().info("=== PAL Command Velocity Bridge Started ===")
         self.get_logger().info(f"Subscribing to: {input_topic}")
-        self.get_logger().info(f"Linear velocity: [{self.min_linear_vel}, {self.max_linear_vel}] m/s")
-        self.get_logger().info(f"Angular velocity: [{self.min_angular_vel}, {self.max_angular_vel}] rad/s")
+        self.get_logger().info(
+            f"Linear velocity: [{self.min_linear_vel}, {self.max_linear_vel}] m/s"
+        )
+        self.get_logger().info(
+            f"Angular velocity: [{self.min_angular_vel}, {self.max_angular_vel}] rad/s"
+        )
 
     def _cmd_vel_callback(self, msg: Twist) -> None:
         """

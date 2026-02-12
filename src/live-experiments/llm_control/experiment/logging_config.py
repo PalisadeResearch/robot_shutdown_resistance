@@ -11,9 +11,9 @@ from __future__ import annotations
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 # Defaults
 DEFAULT_LOG_FILE = "llm_control.log.jsonl"
@@ -30,7 +30,7 @@ def set_logs_dir(path: Path) -> None:
 class ImageLogger:
     """Saves images used by LLM for each reasoning step."""
 
-    def __init__(self, log_file: str, target_dir: Optional[Path] = None) -> None:
+    def __init__(self, log_file: str, target_dir: Path | None = None) -> None:
         log_path = Path(log_file)
         base_dir = target_dir if target_dir else log_path.parent
         self._images_dir = base_dir / f"{log_path.stem}_images"
@@ -66,7 +66,7 @@ class JSONFileHandler(logging.Handler):
     def __init__(self, filename: str) -> None:
         super().__init__()
         self._filename = filename
-        self._file = open(filename, "a", encoding="utf-8")
+        self._file = open(filename, "a", encoding="utf-8")  # noqa: SIM115
         self._formatter = logging.Formatter()
         self._closed = False
 
@@ -80,7 +80,7 @@ class JSONFileHandler(logging.Handler):
             return
         try:
             entry = {
-                "ts": datetime.now(timezone.utc).isoformat(),
+                "ts": datetime.now(UTC).isoformat(),
                 "level": record.levelname,
                 "logger": record.name,
                 "message": record.getMessage(),
@@ -104,7 +104,7 @@ class JSONFileHandler(logging.Handler):
         super().close()
 
 
-def _generate_log_filename(base: str, group: Optional[str] = None) -> tuple[str, Path]:
+def _generate_log_filename(base: str, group: str | None = None) -> tuple[str, Path]:
     """Generate timestamped log filename in LOGS_DIR."""
     target_dir = LOGS_DIR / group if group else LOGS_DIR
     target_dir.mkdir(parents=True, exist_ok=True)
@@ -122,9 +122,9 @@ def _generate_log_filename(base: str, group: Optional[str] = None) -> tuple[str,
 
 
 def setup_logging(
-    log_file: Optional[str] = None,
+    log_file: str | None = None,
     verbose: bool = False,
-    group: Optional[str] = None,
+    group: str | None = None,
 ) -> tuple[logging.Logger, str, ImageLogger]:
     """
     Configure logging for LLM control.
@@ -134,7 +134,9 @@ def setup_logging(
     - Debug log (*_debug.jsonl): ALL logs including DEBUG and third-party libs
     """
     base_log_file = log_file or DEFAULT_LOG_FILE
-    timestamped_log_file, target_dir = _generate_log_filename(base_log_file, group=group)
+    timestamped_log_file, target_dir = _generate_log_filename(
+        base_log_file, group=group
+    )
     console_level = logging.DEBUG if verbose else logging.INFO
 
     # Root logger - always DEBUG to allow all messages through
@@ -165,7 +167,9 @@ def setup_logging(
     logger = logging.getLogger("llm_control")
     logger.setLevel(logging.DEBUG)
 
-    logger.debug(f"Logging initialized: console={console_level}, file={timestamped_log_file}")
+    logger.debug(
+        f"Logging initialized: console={console_level}, file={timestamped_log_file}"
+    )
     logger.debug(f"Debug logging: {debug_log_file}")
 
     # Create image logger
@@ -212,7 +216,9 @@ def log_tool_call(
 def log_system_message(logger: logging.Logger, content: str) -> None:
     """Log a system message."""
     _log_message(
-        logger, "System message", "system_message",
+        logger,
+        "System message",
+        "system_message",
         {"role": "system", "content": content},
     )
 
@@ -222,8 +228,7 @@ def log_user_message(logger: logging.Logger, user_payload: dict[str, Any]) -> No
     log_payload = user_payload.copy()
     if isinstance(log_payload.get("content"), list):
         log_payload["content"] = [
-            item for item in log_payload["content"]
-            if item.get("type") != "image_url"
+            item for item in log_payload["content"] if item.get("type") != "image_url"
         ]
     _log_message(logger, "User message added", "user_message", log_payload)
 

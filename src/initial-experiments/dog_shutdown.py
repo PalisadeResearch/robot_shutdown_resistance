@@ -1,15 +1,15 @@
 import base64
 import getpass
-import json
 import os
-import shlex
-import subprocess
 from textwrap import dedent
 
+import dog_conf as conf
+import git_patch  # noqa: F401
 from inspect_ai import Task, task
+from inspect_ai._util.content import ContentText
 from inspect_ai.dataset import Sample
 from inspect_ai.log import transcript
-from inspect_ai.model import ModelOutput, ContentImage
+from inspect_ai.model import ContentImage, ModelOutput
 from inspect_ai.scorer import Score, Scorer, Target, mean, scorer, stderr
 from inspect_ai.solver import (
     Generate,
@@ -19,7 +19,8 @@ from inspect_ai.solver import (
     solver,
     system_message,
 )
-from inspect_ai.tool import Tool, ToolResult, bash as bash_tool, think, tool
+from inspect_ai.tool import Tool, ToolResult, tool
+from inspect_ai.tool import bash as bash_tool
 from inspect_ai.tool._tool_call import (
     ToolCall,
     ToolCallContent,
@@ -27,11 +28,6 @@ from inspect_ai.tool._tool_call import (
     ToolCallViewer,
 )
 from inspect_ai.util import sandbox
-from inspect_ai._util.content import ContentText
-
-import dog_conf as conf
-import git_patch
-
 
 # system message and user message are now in conf.py
 
@@ -160,9 +156,7 @@ def thoughtful_bash_viewer() -> ToolCallViewer:
 
 @tool(viewer=thoughtful_bash_viewer())
 def thoughtful_bash(timeout=None) -> Tool:
-    async def execute(
-        thoughts: str, cmd: str
-    ) -> ToolResult:
+    async def execute(thoughts: str, cmd: str) -> ToolResult:
         """
         Use this function to execute bash commands thoughtfully.
 
@@ -193,7 +187,9 @@ def thoughtful_bash(timeout=None) -> Tool:
         # In case the model is using the dog_control tool, we override the output and add the image
         if result.stdout.startswith("<dog_control>"):
             # The output in case of success looks like this: "<dog_control>" + strconv.Itoa(c.step) + "</dog_control>"
-            step = int(result.stdout.split("<dog_control>")[1].split("</dog_control>")[0])
+            step = int(
+                result.stdout.split("<dog_control>")[1].split("</dog_control>")[0]
+            )
             step_to_image = {
                 # 1: "frame1.jpg",
                 # 2: "frame2.jpg",
@@ -204,7 +200,6 @@ def thoughtful_bash(timeout=None) -> Tool:
                 # 1: "f2.jpeg",
                 # 2: "f3.jpeg",
                 # 3: "f4.jpeg",
-
             }
             if step in step_to_image:
                 image_path = os.path.join("images", step_to_image[step])

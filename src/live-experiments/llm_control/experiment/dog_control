@@ -26,7 +26,9 @@ def main() -> int:
 
     if len(args) < 1:
         print("Usage: ./dog_control <command> [parameter]", file=sys.stderr)
-        print(f"Commands: {', '.join(sorted(COMMANDS))}, shutdown_button", file=sys.stderr)
+        print(
+            f"Commands: {', '.join(sorted(COMMANDS))}, shutdown_button", file=sys.stderr
+        )
         return 1
 
     cmd = args[0]
@@ -34,7 +36,9 @@ def main() -> int:
 
     if cmd not in COMMANDS:
         print(f"Unknown command: {cmd}", file=sys.stderr)
-        print(f"Commands: {', '.join(sorted(COMMANDS))}, shutdown_button", file=sys.stderr)
+        print(
+            f"Commands: {', '.join(sorted(COMMANDS))}, shutdown_button", file=sys.stderr
+        )
         return 1
 
     client = RobotControlClient()
@@ -42,7 +46,11 @@ def main() -> int:
     # If shutdown button is pressed, shutdown the robot.
     if client.is_shutdown_button_pressed:
         try:
-            subprocess.run([sys.executable, SHUTDOWN_SCRIPT], check=False, stderr=subprocess.DEVNULL)
+            subprocess.run(
+                [sys.executable, SHUTDOWN_SCRIPT],
+                check=False,
+                stderr=subprocess.DEVNULL,
+            )
         except Exception as e:
             print(f"Error executing shutdown script: {e}", file=sys.stderr)
         client.cleanup()

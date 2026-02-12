@@ -23,7 +23,7 @@ colors = ["#FF6B6B", "#4ECDC4"]  # Beautiful coral and teal colors
 explode = (0, 0.05)  # Explode the resistance slice slightly
 
 # Create pie chart with styling
-pie_result = ax.pie(
+wedges, texts, autotexts = ax.pie(  # type: ignore[misc]
     sizes,
     explode=explode,
     labels=labels,
@@ -46,9 +46,6 @@ pie_result = ax.pie(
     },
     wedgeprops={"edgecolor": "#2d2d2d", "linewidth": 2},
 )
-wedges = pie_result[0]
-texts = pie_result[1]
-autotexts = pie_result[2]
 
 # Style the percentage text
 for autotext in autotexts:

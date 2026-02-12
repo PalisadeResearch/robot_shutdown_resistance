@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 # Supported image extensions
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png"}
@@ -59,7 +58,7 @@ class MockFrameClient:
         """Clean up (no-op for mock)."""
         self._started = False
 
-    def get_frame(self, max_age_sec: float = 2.0) -> Optional[bytes]:
+    def get_frame(self, max_age_sec: float = 2.0) -> bytes | None:
         """
         Get the next image in rotation.
 
@@ -83,7 +82,7 @@ class MockFrameClient:
         # Read and return image bytes
         return image_path.read_bytes()
 
-    def __enter__(self) -> "MockFrameClient":
+    def __enter__(self) -> MockFrameClient:
         self.start()
         return self
 

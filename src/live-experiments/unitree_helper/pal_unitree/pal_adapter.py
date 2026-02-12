@@ -43,7 +43,11 @@ class _PrioritySportClient(SportClient):
         except Exception as exc:
             # Best-effort; fall back to default priority if this fails.
             import sys
-            print(f"Warning: Failed to set high-priority stop APIs: {exc}", file=sys.stderr)
+
+            print(
+                f"Warning: Failed to set high-priority stop APIs: {exc}",
+                file=sys.stderr,
+            )
 
 
 class PalAdapter:

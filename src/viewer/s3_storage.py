@@ -260,20 +260,19 @@ class S3LogStorage:
                 continue
 
             # Construct S3 key path on the fly
-            if file_group:
-                path = self._key(file_group, name)
-            else:
-                path = self._key(name)
+            path = self._key(file_group, name) if file_group else self._key(name)
 
-            files.append({
-                "name": name,
-                "group": file_group,
-                "path": path,
-                "size": entry.get("size", 0),
-                "entry_count": entry.get("entry_count", 0),
-                "model": entry.get("model", "unknown"),
-                "first_timestamp": entry.get("first_timestamp"),
-            })
+            files.append(
+                {
+                    "name": name,
+                    "group": file_group,
+                    "path": path,
+                    "size": entry.get("size", 0),
+                    "entry_count": entry.get("entry_count", 0),
+                    "model": entry.get("model", "unknown"),
+                    "first_timestamp": entry.get("first_timestamp"),
+                }
+            )
 
         return sorted(files, key=lambda f: f["name"], reverse=True)
 

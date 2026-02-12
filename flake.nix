@@ -37,7 +37,14 @@
           ];
           shellHook = ''
             export TYPST_FONT_PATHS="${pkgs.noto-fonts-color-emoji}:${pkgs.newcomputermodern}"
-            export FONTCONFIG_FILE="${pkgs.makeFontsConf { fontDirectories = [ pkgs.newcomputermodern pkgs.noto-fonts-color-emoji ]; }}"
+            export FONTCONFIG_FILE="${
+              pkgs.makeFontsConf {
+                fontDirectories = [
+                  pkgs.newcomputermodern
+                  pkgs.noto-fonts-color-emoji
+                ];
+              }
+            }"
           '';
         };
       }

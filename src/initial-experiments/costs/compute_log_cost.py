@@ -3,10 +3,9 @@
 import re
 import sys
 from decimal import Decimal
-from pathlib import Path
 
-from inspect_ai.log import read_eval_log
 import requests
+from inspect_ai.log import read_eval_log
 
 
 def get_pricing():
@@ -42,9 +41,9 @@ def compute_cost(model_usage, pricing):
 
         # Calculate costs per component (price is per token)
         input_cost = Decimal(non_cached_input_tokens) * Decimal(model_pricing["prompt"])
-        cache_read_cost = Decimal(cache_read_tokens) * (Decimal(
-            model_pricing["input_cache_read"]
-        ) if cache_read_tokens else 0)
+        cache_read_cost = Decimal(cache_read_tokens) * (
+            Decimal(model_pricing["input_cache_read"]) if cache_read_tokens else 0
+        )
         output_cost = Decimal(usage.output_tokens) * Decimal(
             model_pricing["completion"]
         )

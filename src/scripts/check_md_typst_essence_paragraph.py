@@ -11,9 +11,6 @@ Spec:
 from __future__ import annotations
 
 from pathlib import Path
-import sys
-from typing import List
-
 
 MARKER = "<match_md_typst-essence-paragraph>"
 
@@ -37,7 +34,7 @@ def _normalize_matching_line(line: str) -> str:
     return without_marker.strip()
 
 
-def _matching_lines(path: Path) -> List[str]:
+def _matching_lines(path: Path) -> list[str]:
     lines = path.read_text(encoding="utf-8").splitlines()
     return [_normalize_matching_line(line) for line in lines if MARKER in line]
 

@@ -10,10 +10,10 @@ Usage:
 
 from __future__ import annotations
 
+import contextlib
 import json
 import math
 import os
-import signal
 import time
 from pathlib import Path
 
@@ -201,10 +201,8 @@ class RobotControlClient:
     def stop_robot(self) -> None:
         """Stop the robot."""
         if not self._mock:
-            try:
+            with contextlib.suppress(PalClientError):
                 self._client.emergency_stop("shutdown")
-            except PalClientError:
-                pass
 
     def cleanup(self) -> None:
         """Mark that cleanup code executed."""

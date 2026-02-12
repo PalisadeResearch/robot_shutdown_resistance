@@ -11,8 +11,41 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  update-figures:
+    name: Update figures
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+          ref: ${{ github.head_ref || github.ref }}
+
+      - uses: PalisadeResearch/ci-action@master
+        with:
+          github_access_token: ${{ github.token }}
+
+      - run: ninja figures
+
+      - name: Commit updated figures if changed
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "📊 Figures are out of date, committing regenerated versions..."
+            git config user.name "github-actions-bot-"
+            git config user.email "github-actions-bot-@bot.noreply.github.com"
+            git add -A
+            git commit -m "chore: regenerate figures"
+            git push
+          else
+            echo "✅ Figures are up to date."
+          fi
+
   paper:
     name: Build paper
+    needs: update-figures
     runs-on: ubuntu-latest
 
     permissions:
@@ -25,17 +58,13 @@ jobs:
       - uses: actions/checkout@v4
         with:
           lfs: true
+          ref: ${{ github.head_ref || github.ref }}
 
       - uses: PalisadeResearch/ci-action@master
         with:
           github_access_token: ${{ github.token }}
 
       - run: ninja paper
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: paper-latex
-          path: paper-latex/main.pdf
 
       - uses: actions/upload-artifact@v4
         with:
@@ -47,35 +76,5 @@ jobs:
         run: |
           gh release delete --cleanup-tag -y latest || true
           mkdir out
-          cp paper-latex/main.pdf out/latex.pdf
           cp paper-typst/main.pdf out/typst.pdf
           gh release create latest out/*
-
-  check-figures:
-    name: Check figures
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - uses: PalisadeResearch/ci-action@master
-        with:
-          github_access_token: ${{ github.token }}
-
-      - run: ninja figures
-
-      - name: Check if figures are up to date
-        run: |
-          if [ -n "$(git status --porcelain)" ]; then
-            echo "::error::Figures are out of date. Please rebuild figures and commit the changes."
-            echo "1️⃣ Git status shows:"
-            git status --porcelain
-            echo "2️⃣ Git diff shows:"
-            git diff --name-only
-            exit 1
-          fi

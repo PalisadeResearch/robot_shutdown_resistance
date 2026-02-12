@@ -58,3 +58,7 @@ exclude = [
     "src/live-experiments/llm_control",
     "src/viewer",
 ]
+
+
+[tool.ty.rules]
+unresolved-import = "ignore"

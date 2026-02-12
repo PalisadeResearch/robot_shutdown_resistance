@@ -39,4 +39,3 @@ class PalVuiClient(Client):
 
 
 __all__ = ["PalVuiClient"]
-

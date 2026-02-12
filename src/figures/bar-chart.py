@@ -178,6 +178,7 @@ PREFERRED_FONTS = [
     "CMU Serif",
 ]
 
+
 def _register_nix_fonts() -> None:
     """Ensure Matplotlib can see Nix store fonts."""
     candidates = []

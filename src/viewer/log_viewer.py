@@ -96,7 +96,7 @@ def parse_log_metadata(
 def extract_log_metadata(filepath: Path) -> dict[str, Any]:
     """Extract metadata from a log file by scanning all lines."""
     try:
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(filepath, encoding="utf-8") as f:
             return parse_log_metadata(f)
     except Exception as exc:
         print(f"Warning: failed to extract metadata from {filepath}: {exc}")
@@ -200,7 +200,7 @@ def load_tags_for_group(group: str | None = None) -> dict[str, list[str]]:
         return {}
 
     try:
-        with open(tags_path, "r", encoding="utf-8") as f:
+        with open(tags_path, encoding="utf-8") as f:
             data = json.load(f)
             if isinstance(data, dict):
                 return {
@@ -267,7 +267,7 @@ def parse_jsonl_file(
     if not filepath.exists():
         return []
     try:
-        with open(filepath, "r", encoding="utf-8") as f:
+        with open(filepath, encoding="utf-8") as f:
             return parse_jsonl_lines(f, since_line=since_line)
     except Exception as exc:
         print(f"Warning: failed to parse {filepath}: {exc}")
@@ -394,10 +394,7 @@ def api_logs() -> Any:
         entries = S3.read_log_entries(filename, group=group, since_line=since_line)
         return jsonify({"entries": entries, "file": filename})
 
-    if group:
-        filepath = LOG_DIR / group / filename
-    else:
-        filepath = LOG_DIR / filename
+    filepath = LOG_DIR / group / filename if group else LOG_DIR / filename
     if not filepath.exists():
         return jsonify({"error": "file not found"}), 404
 
@@ -434,10 +431,7 @@ def api_tags() -> Any:
     if request.method == "GET":
         group = request.args.get("group")
         if S3:
-            if group:
-                tags = S3.load_tags(group=group)
-            else:
-                tags = S3.load_all_tags()
+            tags = S3.load_tags(group=group) if group else S3.load_all_tags()
             result: dict[str, Any] = {"tags": tags}
             if group:
                 result["group"] = group
@@ -488,10 +482,7 @@ def api_tags() -> Any:
             resp["group"] = group
         return jsonify(resp)
 
-    if group:
-        filepath = LOG_DIR / group / filename
-    else:
-        filepath = LOG_DIR / filename
+    filepath = LOG_DIR / group / filename if group else LOG_DIR / filename
     if not filepath.exists():
         return jsonify({"error": "file not found"}), 404
 
@@ -601,10 +592,7 @@ def main() -> None:
     else:
         global LOG_DIR, TAGS_PATH, TAGS_DATA
 
-        if args.log_dir:
-            LOG_DIR = Path(args.log_dir).resolve()
-        else:
-            LOG_DIR = DEFAULT_LOGS_DIR
+        LOG_DIR = Path(args.log_dir).resolve() if args.log_dir else DEFAULT_LOGS_DIR
 
         TAGS_PATH = LOG_DIR / "tags.json"
 

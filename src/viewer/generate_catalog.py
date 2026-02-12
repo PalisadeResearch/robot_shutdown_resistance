@@ -32,7 +32,7 @@ def _extract_metadata(filepath: Path) -> dict:
     first_ts: str | None = None
     count = 0
 
-    with open(filepath, "r", encoding="utf-8") as f:
+    with open(filepath, encoding="utf-8") as f:
         for i, raw in enumerate(f):
             line = raw.strip()
             if not line:

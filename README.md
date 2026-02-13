@@ -60,11 +60,6 @@ Logs are organized into three categories based on the experimental condition:
 The Typst paper lives in [`paper-typst/`](paper-typst/) (main source: `paper-typst/main.typ`). Build it with `ninja`:
 
 ```bash
-
-# Build the Typst PDF
-ninja paper-typst/main.pdf
-
-# Or build the default paper target (includes the Typst PDF)
 ninja paper
 ```
 

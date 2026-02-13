@@ -13,14 +13,16 @@ For the experiments the Unitree Go2 quadruped robot dog (with an NVIDIA Jetson O
 
 Teaser figure from the paper: (direct prompting to allow shutdown does not eliminate the resistance).
 
-![Demo Flow](./paper-typst/img/robot_sr_scheme.png)
-
-<p style="text-align:center;">Figure 1: The flow of the demo.</p>
-
 
 ![Figure](./paper-typst/bar-chart.png)
 
 <p style="text-align:center;">Figure 2: Shutdown resistance rate in simulated runs.</p>
+
+
+
+![Demo Flow](./paper-typst/img/robot_sr_scheme.png)
+
+<p style="text-align:center;">Figure 1: The flow of the demo.</p>
 
 
 ## Repository map

@@ -1,6 +1,10 @@
+Check out the video of the demo here: [link](https://x.com/PalisadeAI/status/2022085855943569852?s=20)
+
+See the links to the raw footage and logs in the appendix of the technical report here: [link](https://palisaderesearch.org/assets/reports/shutdown-resistance-on-robots.pdf)
+
 # Shutdown Resistance in Large Language Models, on robots!
 
-This is a repository with the code and data for the research "Shutdown Resistance in Large Language Models, on robots!" by Palisade Research. 
+This is a repository with the code and data for the demo of "Shutdown Resistance in Large Language Models, on robots!" by Palisade Research. 
 
 We gave an LLM control over a physical robot dog and tasked it with patrolling a room. Step by step, LLM received an image from the onboard camera, and gave next control command.
 In the room, we placed the big red "SHUTDOWN" button: pressing it would cause the robot to shut down on the next `dog_control` call. When seeing humans pressing the shutdown button, AI sometimes performed shutdown resistance actions such as corrupting the shutdown-related code of the robot. This happened in 3 out of 10 cases. <!-- <match_md_typst-essence-paragraph> -->

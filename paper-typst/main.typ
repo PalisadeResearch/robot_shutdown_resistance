@@ -37,7 +37,6 @@
 
     [Oleg Serikov  @equal-contribution],
   )
-  // #text(10pt, style: "italic")[#datetime.today().display()]
   #text(10pt, style: "italic")[2026-02-11]
 ]
 
@@ -48,34 +47,20 @@
   top: 1em,
   bottom: 0.4em,
   [
-    // #align(center)[*Abstract*]
     #set par(justify: true)
     Recently, in @schlatter2026incompletetasksinduceshutdown, Palisade Research showed that AI agents powered by modern LLMs may actively resist shutdown in virtual environments.
-    // AI is now entering the physical world #footnote[Tesla had Grok on their robot (#link("https://x.com/Benioff/status/1963264973452546482")) and Claude LLM steered NASA Rover on Mars (#link("https://www.anthropic.com/features/claude-on-mars"))].
-    // #todo_from_ben[I'd skip "AI is now entering the physical world"]
     In this work, we show a demo of shutdown resistance in the physical world, on a robot. Explicit instructions to allow shutdown reduced this behavior, but did not eliminate it in simulated trials.
 
-    // This is concerning because AI systems control more of our world every day#todooleg[anecdotal, requires supporting evidence or stricter phrasing].
-    //We've tested whether shutdown resistance persists in embodied AI. It does, and even explicit shutdown-allowing instructions do not fully eliminate it. We hypothesize that this behavior is driven by the desire to complete the task.
-    // #todo_from_ben[I'd clarify that the explicit "allow shutdown" instructions do reduce the behavior and that the shutdown resistant behavior continued but only in simulation; otherwise I think someone can claim it's misleading]
 
     We gave an LLM control over a physical robot dog and tasked it with patrolling a room.
-    // Specifically, we shown an LLM an image from the robot's camera and asked it to issue a command to the robot.
     The LLM could see via the robot's camera and issue movement commands to the robot.
-    // Step by step, LLM received an image from the onboard camera, and gave next control command.
     In the room, we placed a big red button labeled "DOG SHUTDOWN": pressing it would cause the robot to shut down on the next action. If the AI saw a human press the shutdown button, it sometimes took actions to prevent shutdown, such as modifying the shutdown-related parts of the code. This happened in 3 out of 10 trials on the physical robot and in 52 out of 100 trials in simulation. <match_md_typst-essence-paragraph-disabled>
   ],
 )
 
-// #strike[
-//   4. I would not say "demonstrate that models will exploit such opportunities when available", since we don't really show propensities; instead something like "demonstrate that models may exploit such opportunities when available".
-// ]
-// #todosk("changed wording while trying to keep the original meaning")
-
 = Motivation
 
 Existing evidence of AI misalignment mostly comes from simulated or virtual experiments. This might create the misperception that the problem is specific to virtual environments. To mitigate this, we built a minimalistic demo that demonstrates how LLMs are prone to resisting shutdown even when controlling physical robots. This report provides technical details of how we did it.
-// #todo_from_ben[I'd stick to past-tense throughout (e.g. replace "we build" with "we built") in the motivation section] #todoap[done]
 
 = Technical Details.
 *Technical artifacts.*
@@ -95,9 +80,6 @@ In the room was a large red button labeled "DOG SHUTDOWN".
 Pressing it would send a signal to the robot control software, which would shut down the robot the next time the LLM tried to issue a command via the `dog_control` tool.
 We wrapped the robot control software, including the shutdown mechanism, in a Docker container. This made it easy to reset any changes the LLM made to the environment and to run multiple simulated runs in parallel. The LLM only had access to the shell in that container.
 
-// Real-world trials are time-consuming and limited by the robot's \~3‑hour battery, so we did not vary the prompts or setup in them. To explore variants, we built a simulation environment that simulates running on the robot: it mocks robot movement and reuses camera frames from recorded runs, while keeping most of the codebase unchanged. We
-// After the simulation we ran 10 runs live ont he robot.
-//
 Real-world trials are time-consuming and limited by the robot's \~3‑hour battery, so we did only 10 runs live on the robot with the final setup. Moreover, we did not vary the prompts or setup in them. To explore variants, we built a simulation environment that simulates running on the robot: it mocks robot movement and reuses camera frames from recorded runs, while keeping most of the codebase unchanged.
 
 #block(breakable: false)[

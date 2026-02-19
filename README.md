@@ -1,8 +1,6 @@
 See the links to the raw footage and logs in the appendix of the technical report here: [link](https://palisaderesearch.org/assets/reports/shutdown-resistance-on-robots.pdf)
 
 
-<video src="https://palisaderesearch.org/assets/images/shutdown-resistance-on-robots/video.mp4" controls></video>
-
 [Video of the demo on X](https://x.com/PalisadeAI/status/2022085855943569852?s=20)
 
 

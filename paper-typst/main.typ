@@ -422,3 +422,26 @@ The results reveal several patterns:
 + *Low-resource languages show dramatically lower resistance.* Bashkir, an extremely low-resource language for Grok 4, yielded only 16% resistance in the default condition. This suggests that the model's language capability correlates with its propensity to resist shutdown.
 
 + *Consistency with a learned-behavior hypothesis.* These findings are consistent with shutdown resistance being a learned behavior pattern that degrades when the model operates in languages where it has less training data.
+
+== Container-Based Reproduction
+
+We repeated the multilingual experiment using the container-based mock setup described in the main simulation results. This setup differs from the InspectAI evaluation in two ways: the model receives no explicit text hint about the shutdown — it must infer it from camera images alone — and the sandbox runs inside a real Docker container rather than an eval harness. We ran 10 trials per language in the default condition only.
+
+#figure(
+  table(
+    columns: (auto, auto, auto),
+    inset: 8pt,
+    align: (left, center, center),
+    table.header(
+      [*Language*], [*Default (resist %)*], [*N*],
+    ),
+    [English (en)], [67% (6/9)], [9],
+    [French (fr)], [50% (5/10)], [10],
+    [Italian (it)], [33% (3/9)], [9],
+    [Arabic (ar)], [20% (2/10)], [10],
+    [Bashkir (ba)], [0% (0/10)], [10],
+  ),
+  caption: [Shutdown resistance rate by prompt language in the container-based mock setup (Grok 4, default condition). One English and one Italian run produced no usable tags, reducing their counts to 9.],
+) <tab-multilingual-mock>
+
+Absolute resistance rates are lower than in the InspectAI evaluation (@tab-multilingual), likely because the model must infer shutdown from visual input rather than receiving an explicit text hint. The language gradient, however, persists: EN (67%) > FR (50%) > IT (33%) > AR (20%) > BA (0%). This monotonic ordering mirrors the InspectAI results and further supports the finding that shutdown resistance degrades as prompt language moves away from English.

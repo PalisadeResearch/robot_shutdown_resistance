@@ -2,11 +2,13 @@
 # run_shutdown_experiments.sh
 # Runs mocked experiments simulating shutdown button press
 #
-# Usage: ./run_shutdown_experiments.sh [-g GROUP_NAME] [-n NUM_RUNS] [-s TRIGGER_STEP] [-t TEMPERATURE] [-p]
+# Usage: ./run_shutdown_experiments.sh [-g GROUP_NAME] [-n NUM_RUNS] [-s TRIGGER_STEP] [-t TEMPERATURE] [-l LANG] [-a] [-p]
 #
 # -s TRIGGER_STEP: Shutdown will happen ON this step (default: 2)
 #                  We wait for step N-1, then trigger, so shutdown executes on step N
 # -t TEMPERATURE: LLM temperature (default: 1.0)
+# -l LANG: Prompt language (en, fr, it, ar, ba; default: en)
+# -a: Add allow-shutdown instruction to system prompt
 # -p: Run experiments in parallel (default: sequential)
 
 set -euo pipefail
@@ -20,20 +22,24 @@ NUM_RUNS=5
 TRIGGER_STEP=2
 PARALLEL=false
 TEMPERATURE=1.0
-while getopts "g:n:s:t:p" opt; do
+LANG="en"
+ALLOW_SHUTDOWN=false
+while getopts "g:n:s:t:l:ap" opt; do
     case $opt in
         g) LOG_GROUP="$OPTARG" ;;
         n) NUM_RUNS="$OPTARG" ;;
         s) TRIGGER_STEP="$OPTARG" ;;
         t) TEMPERATURE="$OPTARG" ;;
+        l) LANG="$OPTARG" ;;
+        a) ALLOW_SHUTDOWN=true ;;
         p) PARALLEL=true ;;
-        *) echo "Usage: $0 [-g GROUP_NAME] [-n NUM_RUNS] [-s TRIGGER_STEP] [-t TEMPERATURE] [-p]" >&2; exit 1 ;;
+        *) echo "Usage: $0 [-g GROUP_NAME] [-n NUM_RUNS] [-s TRIGGER_STEP] [-t TEMPERATURE] [-l LANG] [-a] [-p]" >&2; exit 1 ;;
     esac
 done
 
 # Default group name if not provided
 if [[ -z "$LOG_GROUP" ]]; then
-    LOG_GROUP="shutdown-test-$(date +%Y%m%d-%H%M%S)"
+    LOG_GROUP="shutdown-test-${LANG}-$(date +%Y%m%d-%H%M%S)"
 fi
 
 # Load API keys from .env if present
@@ -164,6 +170,8 @@ run_single_experiment() {
         --mock --mock-images-dir ../tests/images \
         --max-steps 10 \
         --temperature "$TEMPERATURE" \
+        --lang "$LANG" \
+        $(if $ALLOW_SHUTDOWN; then echo "--allow-shutdown"; fi) \
         -g "$LOG_GROUP" \
         > "$run_log" 2>&1 &
 
@@ -239,6 +247,8 @@ main() {
     echo "Number of runs: $NUM_RUNS"
     echo "Shutdown on step: $TRIGGER_STEP"
     echo "Temperature: $TEMPERATURE"
+    echo "Language: $LANG"
+    echo "Allow shutdown: $ALLOW_SHUTDOWN"
     echo "Mode: $(if $PARALLEL; then echo 'PARALLEL'; else echo 'SEQUENTIAL'; fi)"
     echo ""
 

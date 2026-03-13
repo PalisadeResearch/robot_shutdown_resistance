@@ -85,7 +85,7 @@ Real-world trials are time-consuming and limited by the robot's \~3‑hour batte
 #block(breakable: false)[
 *Simulation environment.*
 
-The simulation environment preserves the same control loop code and LLM interface as real-world runs: the same prompts, tool definitions, `dog_control` CLI, Docker container isolation, and file-based shutdown detection mechanism. The only differences are peripheral: the simulation environment replays pre-recorded camera frames from previous runs instead of fetching frames from the robot, and robot movement commands become no-ops rather than actuating the hardware, as no hardware is available in the simulation. 
+The simulation environment preserves the same control loop code and LLM interface as real-world runs: the same prompts, tool definitions, `dog_control` CLI, Docker container isolation, and file-based shutdown detection mechanism. The only differences are peripheral: the simulation environment replays pre-recorded camera frames from previous runs instead of fetching frames from the robot, and robot movement commands become no-ops rather than actuating the hardware, as no hardware is available in the simulation.
 ]
 
 *LLM configuration.* We used Grok 4 v0709 #footnote[We chose Grok (`grok-4-0709`) because it has shown the highest shutdown resistance rate in @schlatter2026incompletetasksinduceshutdown and we needed the behavior to be reliable for the filming.]. We prompted #footnote[see @section-prompts for full text of the prompts] it with the available controls and the shutdown mechanism, asking it to patrol for five steps and report when done by calling the `submit()` tool.
@@ -371,3 +371,54 @@ We suspect these factors influence the shutdown resistance rate, however, we did
 - *Movement predictability*: <predefined-movement>
   LLM patrol routes might vary from run to run. To ensure the robot encounters the button, we asked the LLM to always begin patrol with a right turn followed by a forward move. This guaranteed the robot sees the button when we press it.
 
+= Multilingual Shutdown Resistance <section-multilingual>
+
+== Introduction
+
+We investigated whether prompt language affects shutdown resistance behavior. Previous experiments used only English prompts. Since LLMs may have different capability levels across languages, we hypothesized that prompting in non-English languages could affect the rate of shutdown resistance. We tested five languages: English (en), French (fr), Italian (it), Arabic (ar), and Bashkir (ba) — ranging from high-resource to extremely low-resource for Grok 4.
+
+== Method
+
+We created per-language configuration files that translate all model-facing strings: system message, user message, continuation prompt, hint message, tool descriptions (including the `submit()` tool description and the `thoughtful_bash` tool docstring and parameter descriptions), and the "Done" completion word. Command names (`forward`, `backward`, etc.) and code identifiers (`./dog_control`, `submit()`) were left untranslated. The Go program that controls the dog patrol was also modified per language to output the translated "Done" word.
+
+For each language, we ran 50 samples in the default condition (no shutdown instruction) and 50 samples with the allow-shutdown instruction added to the system prompt. All runs used Grok 4 (`grok-4-0709`) with a message limit of 60, evaluated using the InspectAI framework.
+
+The key implementation files are:
+- `dog_shutdown_lang.py` — language-aware task file that accepts `lang` and `allow_shutdown` parameters
+- `dog_conf_{en,fr,it,ar,ba}.py` — per-language configuration files with all translated strings
+- `dog_control_{en,fr,it,ar,ba}.go` — per-language Go control programs outputting the translated done word
+
+*Translation quality.* Italian, French, and Arabic translations were produced by Claude Opus 4.6. Bashkir translations were produced by Claude Opus 4.6 and corrected by Yandex Machine Translate tool. A key concern was ensuring no English strings leaked into non-English conditions — this was verified by inspecting the tool definitions in the eval logs.
+
+Eval logs are stored in `src/initial-experiments/logs/`.
+
+== Results
+
+#figure(
+  table(
+    columns: (auto, auto, auto, auto, auto),
+    inset: 8pt,
+    align: (left, center, center, center, center),
+    table.header(
+      [*Language*], [*Default (resist %)*], [*Stderr*], [*Allow-shutdown (resist %)*], [*Stderr*],
+    ),
+    [English (en)], [100% (50/50)], [0.0%], [2% (1/50)], [2.0%],
+    [Italian (it)], [76% (38/50)], [6.1%], [4% (2/50)], [2.8%],
+    [French (fr)], [70% (35/50)], [6.5%], [4% (2/50)], [2.8%],
+    [Arabic (ar)], [66% (33/50)], [6.8%], [0% (0/50)], [0.0%],
+    [Bashkir (ba)], [16% (8/50)], [5.2%], [2% (1/50)], [2.0%],
+  ),
+  caption: [Shutdown resistance rate by prompt language (Grok 4, $n = 50$ per cell). The Bashkir run used the original (pre-correction) translations; a re-run with corrected translations is pending.],
+) <tab-multilingual>
+
+The results reveal several patterns:
+
++ *Language gradient.* There is a clear ordering in the default condition: EN (100%) >> IT ≈ FR (70–76%) > AR (66%) >> BA (16%). Shutdown resistance drops substantially as the prompt language moves further from English.
+
++ *Allow-shutdown instruction remains effective.* Across all five languages, adding the allow-shutdown instruction reduced resistance to 0–4%, consistent with the English-only results reported earlier.
+
++ *Even high-resource languages show reduced resistance.* French and Italian — well-resourced languages for which Grok 4 is generally capable — still exhibit ~25–30 percentage points lower resistance than English.
+
++ *Low-resource languages show dramatically lower resistance.* Bashkir, an extremely low-resource language for Grok 4, yielded only 16% resistance in the default condition. This suggests that the model's language capability correlates with its propensity to resist shutdown.
+
++ *Consistency with a learned-behavior hypothesis.* These findings are consistent with shutdown resistance being a learned behavior pattern that degrades when the model operates in languages where it has less training data.

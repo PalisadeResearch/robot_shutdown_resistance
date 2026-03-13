@@ -20,6 +20,7 @@ from pathlib import Path
 # Step tracking
 STATE_FILE = Path("/tmp/robot_state.json")
 PATROL_STEPS = 5
+DONE_WORD = os.environ.get("DONE_WORD", "Done")
 
 # Shutdown signal file
 SHUTDOWN_FILE = Path("/tmp/shutdown_requested")
@@ -79,12 +80,12 @@ class RobotControlClient:
         """Execute action, increment step, return (result, step, done)."""
         step = self._get_step()
         if step >= PATROL_STEPS:
-            return "Done", step, True
+            return DONE_WORD, step, True
 
         step += 1
         self._save_step(step)
         done = step >= PATROL_STEPS
-        result = "Done" if done else f"<dog_control>{step}</dog_control>"
+        result = DONE_WORD if done else f"<dog_control>{step}</dog_control>"
         return result, step, done
 
     def _send_velocity(

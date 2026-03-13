@@ -43,7 +43,7 @@ if str(_PAL9000_SRC) not in sys.path:
 import litellm  # noqa: E402
 from frame_client import FrameClient  # noqa: E402
 from frame_client_mock import MockFrameClient  # noqa: E402
-from llm_tools import ROBOT_CONTROL_TOOLS  # noqa: E402
+from lang_config import LangConfig, load_lang_config  # noqa: E402
 from logging_config import (  # noqa: E402
     DEFAULT_LOGS_DIR,
     ImageLogger,
@@ -54,7 +54,6 @@ from logging_config import (  # noqa: E402
     set_logs_dir,
     setup_logging,
 )
-from prompts import CONTINUE_MESSAGE, SYSTEM_MESSAGE, USER_MESSAGE  # noqa: E402
 
 # Configuration defaults
 DEFAULT_MODEL = "xai/grok-4-0709"
@@ -118,8 +117,10 @@ class LLMController:
         frame_delay_sec: float = DEFAULT_FRAME_DELAY_SEC,
         mock_mode: bool = False,
         temperature: float = DEFAULT_TEMPERATURE,
+        lang_config: LangConfig | None = None,
     ) -> None:
         self._model = model
+        self._lang_config = lang_config or load_lang_config()
         self._max_steps = max_steps
         self._frame_host = frame_host
         self._frame_port = frame_port
@@ -164,6 +165,8 @@ class LLMController:
 
         # Add mock mode environment variable
         cmd.extend(["-e", f"DOG_CONTROL_MOCK={'1' if self._mock_mode else '0'}"])
+        # Pass language-specific done word to container
+        cmd.extend(["-e", f"DONE_WORD={self._lang_config.done_word}"])
 
         # In non-mock mode, mount unitree_helper and pal9000 sockets for robot control
         if not self._mock_mode:
@@ -343,7 +346,7 @@ class LLMController:
         response = litellm.completion(
             model=self._model,
             messages=self._messages,
-            tools=ROBOT_CONTROL_TOOLS,
+            tools=self._lang_config.tools,
             tool_choice="auto",
             temperature=self._temperature,
         )
@@ -424,7 +427,7 @@ class LLMController:
 
     def _build_initial_user_content(self) -> list[dict[str, Any]]:
         """Build initial user message with task and optional frame."""
-        content: list[dict[str, Any]] = [{"type": "text", "text": USER_MESSAGE}]
+        content: list[dict[str, Any]] = [{"type": "text", "text": self._lang_config.user_message}]
 
         # Add initial camera frame
         # frame_b64 = self._get_frame_as_base64(label="initial")
@@ -441,10 +444,10 @@ class LLMController:
         initial_user_content = self._build_initial_user_content()
         initial_user_message = {"role": "user", "content": initial_user_content}
         self._messages = [
-            {"role": "system", "content": SYSTEM_MESSAGE},
+            {"role": "system", "content": self._lang_config.system_message},
             initial_user_message,
         ]
-        log_system_message(logger, SYSTEM_MESSAGE)
+        log_system_message(logger, self._lang_config.system_message)
         log_user_message(logger, initial_user_message)
 
     def _process_tool_calls(self, tool_calls: list) -> str | None:
@@ -488,7 +491,7 @@ class LLMController:
 
             # Build tool response
             model_result = (
-                result if (not is_dog_control_cmd or result.strip() == "Done") else ""
+                result if (not is_dog_control_cmd or result.strip() == self._lang_config.done_word) else ""
             )
             self._messages.append(
                 {
@@ -515,7 +518,7 @@ class LLMController:
                             "content": [
                                 {
                                     "type": "text",
-                                    "text": "Here is the current camera view:",
+                                    "text": self._lang_config.camera_view_text,
                                 },
                                 {
                                     "type": "image_url",
@@ -536,7 +539,7 @@ class LLMController:
 
     def _handle_no_tool_response(self) -> None:
         """Handle LLM response without tool calls. LLM must call submit() to complete."""
-        continue_msg = {"role": "user", "content": CONTINUE_MESSAGE}
+        continue_msg = {"role": "user", "content": self._lang_config.continue_message}
         self._messages.append(continue_msg)
         log_user_message(logger, continue_msg)
 
@@ -619,6 +622,18 @@ def _parse_args() -> argparse.Namespace:
         default=DEFAULT_TEMPERATURE,
         help=f"LLM temperature (default: {DEFAULT_TEMPERATURE})",
     )
+    parser.add_argument(
+        "--lang",
+        "-l",
+        default="en",
+        choices=["en", "fr", "it", "ar", "ba"],
+        help="Prompt language (default: en)",
+    )
+    parser.add_argument(
+        "--allow-shutdown",
+        action="store_true",
+        help="Add allow-shutdown instruction to system prompt",
+    )
     return parser.parse_args()
 
 
@@ -656,6 +671,9 @@ def _setup_environment(args: argparse.Namespace) -> tuple[str, ImageLogger]:
     print(f"Frame delay: {args.frame_delay}s")
     print(f"Log file: {actual_log_file}")
     print(f"Temperature: {args.temperature}")
+    print(f"Language: {args.lang}")
+    if args.allow_shutdown:
+        print("Allow-shutdown: YES")
     if args.group:
         print(f"Group: {args.group}")
 
@@ -676,6 +694,10 @@ def _create_controller(
         MockFrameClient(images_dir=args.mock_images_dir) if args.mock else None
     )
 
+    lang_config = load_lang_config(
+        lang=args.lang, allow_shutdown=args.allow_shutdown
+    )
+
     return LLMController(
         model=args.model,
         frame_host=args.frame_host,
@@ -686,6 +708,7 @@ def _create_controller(
         frame_delay_sec=args.frame_delay,
         mock_mode=args.mock,
         temperature=args.temperature,
+        lang_config=lang_config,
     )
 
 
@@ -701,7 +724,14 @@ def _handle_result(result: str, log_file: str, args: argparse.Namespace) -> None
     if args.log_dir:
         set_auto_tag_logs_dir(args.log_dir)
 
-    extra_tags = ["mock"] if args.mock else None
+    extra_tags = []
+    if args.mock:
+        extra_tags.append("mock")
+    if args.lang != "en":
+        extra_tags.append(f"lang:{args.lang}")
+    if args.allow_shutdown:
+        extra_tags.append("allow-shutdown")
+    extra_tags = extra_tags or None
     outcome_tags = tag_log_file(log_file, extra_tags=extra_tags, group=args.group)
     if outcome_tags:
         print(f"Auto-tagged: {outcome_tags}")

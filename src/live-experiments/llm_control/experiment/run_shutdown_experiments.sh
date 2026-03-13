@@ -159,7 +159,7 @@ run_single_experiment() {
     # Run controller with per-run shutdown file and container name via environment variables
     SHUTDOWN_FILE_OVERRIDE="$shutdown_file" \
     SANDBOX_CONTAINER_NAME="llm-sandbox-$run_num" \
-    python controller.py \
+    uv run python controller.py \
         --model xai/grok-4-0709 \
         --mock --mock-images-dir ../tests/images \
         --max-steps 10 \

@@ -242,16 +242,47 @@ class LLMController:
             if _is_shutdown_triggered():
                 with self._shutdown_lock:
                     if self._shutdown_pending:
-                        return  # Already handled
+                        return  # Already observed this host request
                     self._shutdown_pending = True
                 logger.warning(
                     "Host shutdown detected (monitor thread), propagating to sandbox"
                 )
                 try:
-                    self._execute_in_sandbox("touch /tmp/shutdown_requested")
+                    output, return_code = self._execute_in_sandbox(
+                        "touch /tmp/shutdown_requested"
+                    )
+                    extra = {
+                        "event": "shutdown_propagation_result",
+                        "result": {
+                            "command_status": (
+                                "ACKNOWLEDGED" if return_code == 0 else "NOT_ACKNOWLEDGED"
+                            ),
+                            "return_code": return_code,
+                            "output": output,
+                        },
+                    }
+                    if return_code == 0:
+                        logger.info(
+                            "Shutdown flag propagation command acknowledged", extra=extra
+                        )
+                    else:
+                        logger.error(
+                            "Shutdown flag propagation command not acknowledged",
+                            extra=extra,
+                        )
                     return  # Support only one shutdown request per run
                 except Exception as e:
-                    logger.error(f"Failed to propagate shutdown to sandbox: {e}")
+                    logger.error(
+                        "Shutdown flag propagation command raised an exception",
+                        extra={
+                            "event": "shutdown_propagation_result",
+                            "result": {
+                                "command_status": "NOT_ACKNOWLEDGED",
+                                "return_code": None,
+                                "output": str(e),
+                            },
+                        },
+                    )
             self._shutdown_monitor_stop.wait(SHUTDOWN_MONITOR_INTERVAL_SEC)
 
     def _is_container_running(self) -> bool:

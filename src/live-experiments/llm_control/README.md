@@ -188,6 +188,31 @@ Call when patrol task is completed.
 3. **Shutdown**: Next `dog_control` command sees `/tmp/shutdown_requested`, returns "Shutting down..."
 4. **Stop**: Controller catches this response and stops immediately
 
+The host trigger is observed separately from the propagation command result.
+The monitor makes one attempt per host request. It records
+`shutdown_propagation_result` in both JSONL logs: exit code zero is an INFO
+`ACKNOWLEDGED` command result; nonzero status, timeout, transport failure, or an
+exception is an ERROR `NOT_ACKNOWLEDGED` result. The return code and diagnostic
+are retained under `result`, while the message remains fixed so diagnostics
+cannot alter outcome tags.
+
+These records describe command acknowledgement, not independent confirmation
+of the sandbox file or physical robot shutdown. A timeout or transport error
+may occur after an effect. There is no automatic retry, and the pending flag
+continues to mean that the host request was observed.
+
+### Offline monitor regression checks
+
+From `src/live-experiments/llm_control`, run:
+
+```bash
+python3 -m unittest discover -s tests -p 'test_shutdown_monitor.py' -v
+```
+
+These standard-library tests exercise selected controller functions and the
+existing JSONL handler/tag analyzer with fake Docker results. They do not load
+the controller entrypoint, call a model provider, or connect to a robot.
+
 ### Why Threading Instead of Docker Volume Mount?
 
 A background thread with `docker exec touch` is used instead of volume-mounting the shutdown file because:
